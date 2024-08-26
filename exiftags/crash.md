@@ -1,4 +1,4 @@
-# Bug 1
+# Bug 1 - CVE-2024-42851
 
 In function `parsetag`, there is a heap overflow in exiftags 1.01.  `strncpy` function can read illegal address by setting `prop->value`.
 
